@@ -134,12 +134,14 @@ class FS820SDKInterface:
         
         self.cl.DeviceStreamDepthRender(img_registration_depth, img_registration_render)
         mat_depth_render = img_registration_render.as_nparray()
-        cv2.imshow('registration', mat_depth_render)
+        # cv2.imshow('registration', mat_depth_render)
+        cv2.imwrite(depth_path, mat_depth_render)
 
         self.cl.DeviceStreamImageDecode(img_color, img_parsed_color)
         self.cl.DeviceStreamDoUndistortion(color_calib.data(), img_parsed_color, img_undistortion_color)
         mat_undistortion_color = img_undistortion_color.as_nparray()
-        cv2.imshow('undistortion rgb', mat_undistortion_color)
+        # cv2.imshow('undistortion rgb', mat_undistortion_color)
+        cv2.imwrite(gray_path, mat_undistortion_color)
         
         
     def get_hdr_by_targetlights(self, depth_path, gray_path, TargetLights=[40, 50, 60]):
