@@ -93,7 +93,7 @@ class FS820SDKInterface:
         # 实例化对象
         EL = TY_INT_RANGE() 
         # #获取曝光调节范围 
-        TYGetIntRange(handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, EL) 
+        TYGetIntRange(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, EL) 
         print(EL.CSize())
         #打印最小值 最大值 
         print(EL.min,EL.max,EL.inc)
