@@ -48,7 +48,7 @@ class FS820SDKInterface:
             print('no device found')
             return
         
-        self.event = PythonPercipioDeviceEvent.event()
+        self.event = PythonPercipioDeviceEvent()
         self.cl.DeviceRegiststerCallBackEvent(self.event)
         
         # 将当前rgb和depth流打开
