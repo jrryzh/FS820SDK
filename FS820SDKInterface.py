@@ -44,7 +44,7 @@ class FS820SDKInterface:
         self.sn = self.dev_list[selected_idx].id
 
         self.handle = self.cl.Open(self.sn)
-        if not self.cl.isValidHandle(handle):
+        if not self.cl.isValidHandle(self.handle):
             print('no device found')
             return
         
@@ -52,7 +52,7 @@ class FS820SDKInterface:
         self.cl.DeviceRegiststerCallBackEvent(self.event)
         
         # 将当前rgb和depth流打开
-        self.cl.DeviceStreamEnable(handle, PERCIPIO_STREAM_COLOR | PERCIPIO_STREAM_DEPTH)
+        self.cl.DeviceStreamEnable(self.handle, PERCIPIO_STREAM_COLOR | PERCIPIO_STREAM_DEPTH)
     
     def get_camera_intrinsic(self):
         """
@@ -62,7 +62,7 @@ class FS820SDKInterface:
                 [0, fy, cy],
                 [0,  0,  1]]
         """
-        color_calib_data = self.cl.DeviceReadCalibData(handle, PERCIPIO_STREAM_COLOR)
+        color_calib_data = self.cl.DeviceReadCalibData(self.handle, PERCIPIO_STREAM_COLOR)
         color_calib_width = color_calib_data.Width()
         color_calib_height = color_calib_data.Height()
         color_calib_intr = color_calib_data.Intrinsic() # CalibDataVector
