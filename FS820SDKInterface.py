@@ -72,7 +72,7 @@ class FS820SDKInterface:
                                  depth_path: str, 
                                  gray_path: str, 
                                  lr_gray_path: str = None,
-                                 exposure_time: float =80, 
+                                 exposure_time: float =80.0, 
                                  isOpen: bool =True, 
                                  TargetLight: int =50):
         """
@@ -89,12 +89,22 @@ class FS820SDKInterface:
         value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
         print (f"exposure_time: {value}")
         
-        # 设置曝光时间
-        TYSetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, exposure_time)
+        # 查看范围
+        # 实例化对象
+        EL = TY_INT_RANGE() 
+        # #获取曝光调节范围 
+        TYGetIntRange(handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, EL) 
+        print(EL.CSize())
+        #打印最小值 最大值 
+        print(EL.min,EL.max,EL.inc)
         
-        # 查看当前曝光时间
-        value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
-        print (f"exposure_time: {value}")
+        # # 设置曝光时间
+        # exposure_time = int(exposure_time)
+        # TYSetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, exposure_time)
+        
+        # # 查看当前曝光时间
+        # value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
+        # print (f"exposure_time: {value}")
         
         color_fmt_list = self.cl.DeviceStreamFormatDump(self.handle, PERCIPIO_STREAM_COLOR)
         if len(color_fmt_list) == 0:
@@ -163,4 +173,4 @@ if __name__ == '__main__':
     interface = FS820SDKInterface()
     intrinsic = interface.get_camera_intrinsic()
     print(intrinsic)
-    interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.png", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=500, isOpen=True, TargetLight=50)
+    interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.png", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=500.0, isOpen=True, TargetLight=50)
