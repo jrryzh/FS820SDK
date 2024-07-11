@@ -86,7 +86,60 @@ class FS820SDKInterface:
             ErrorCode(int): 0-正常，其他-错误
         """
         
-        pass
+        color_fmt_list = self.cl.DeviceStreamFormatDump(self.handle, PERCIPIO_STREAM_COLOR)
+        if len(color_fmt_list) == 0:
+            print ('device has no color stream.')
+            return
+
+        print ('color image format list:')
+        for idx in range(len(color_fmt_list)):
+            fmt = color_fmt_list[idx]
+            print ('\t{} -size[{}x{}]\t-\t desc:{}'.format(idx, self.cl.Width(fmt), self.cl.Height(fmt), fmt.getDesc()))
+        self.cl.DeviceStreamFormatConfig(self.handle, PERCIPIO_STREAM_COLOR, color_fmt_list[0])
+
+        depth_fmt_list = self.cl.DeviceStreamFormatDump(self.handle, PERCIPIO_STREAM_DEPTH)
+        if len(depth_fmt_list) == 0:
+            print ('device has no depth stream.')
+            return
+
+        print ('depth image format list:')
+        for idx in range(len(depth_fmt_list)):
+            fmt = depth_fmt_list[idx]
+            print ('\t{} -size[{}x{}]\t-\t desc:{}'.format(idx, self.cl.Width(fmt), self.cl.Height(fmt), fmt.getDesc()))
+        self.cl.DeviceStreamFormatConfig(self.handle, PERCIPIO_STREAM_DEPTH, depth_fmt_list[0])
+
+        scale_unit = self.cl.DeviceReadCalibDepthScaleUnit(self.handle)
+        print ('depth image scale unit :{}'.format(scale_unit))
+
+        depth_calib = self.cl.DeviceReadCalibData(self.handle, PERCIPIO_STREAM_DEPTH)
+        color_calib = self.cl.DeviceReadCalibData(self.handle, PERCIPIO_STREAM_COLOR)
+
+        self.cl.DeviceStreamOn(self.handle)
+        img_registration_depth  = image_data()
+        img_registration_render = image_data()
+        img_parsed_color        = image_data()
+        img_undistortion_color  = image_data()
+        
+        image_list = self.cl.DeviceStreamRead(self.handle, 2000)
+        if len(image_list) == 2:
+            for i in range(len(image_list)):
+                frame = image_list[i]
+                if frame.streamID == PERCIPIO_STREAM_DEPTH:
+                    img_depth = frame
+                if frame.streamID == PERCIPIO_STREAM_COLOR:
+                    img_color = frame
+
+        
+        self.cl.DeviceStreamMapDepthImageToColorCoordinate(depth_calib.data(), img_depth.width, img_depth.height, scale_unit,  img_depth,  color_calib.data(), img_color.width, img_color.height, img_registration_depth)
+        
+        self.cl.DeviceStreamDepthRender(img_registration_depth, img_registration_render)
+        mat_depth_render = img_registration_render.as_nparray()
+        cv2.imshow('registration', mat_depth_render)
+
+        self.cl.DeviceStreamImageDecode(img_color, img_parsed_color)
+        self.cl.DeviceStreamDoUndistortion(color_calib.data(), img_parsed_color, img_undistortion_color)
+        mat_undistortion_color = img_undistortion_color.as_nparray()
+        cv2.imshow('undistortion rgb', mat_undistortion_color)
         
         
     def get_hdr_by_targetlights(self, depth_path, gray_path, TargetLights=[40, 50, 60]):
