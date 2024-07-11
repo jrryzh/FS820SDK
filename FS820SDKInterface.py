@@ -87,7 +87,7 @@ class FS820SDKInterface:
         """
         # 查看当前曝光时间
         value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
-        print (f"exposure_time: {value}")
+        print (f"Current exposure_time: {value}")
         
         # 查看范围
         # 实例化对象
@@ -98,13 +98,13 @@ class FS820SDKInterface:
         #打印最小值 最大值 
         print(EL.min,EL.max,EL.inc)
         
-        # # 设置曝光时间
-        # exposure_time = int(exposure_time)
-        # TYSetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, exposure_time)
+        # 设置曝光时间
+        exposure_time = int(exposure_time)
+        TYSetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, exposure_time)
         
-        # # 查看当前曝光时间
-        # value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
-        # print (f"exposure_time: {value}")
+        # 查看当前曝光时间
+        value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
+        print (f" NEW exposure_time: {value}")
         
         color_fmt_list = self.cl.DeviceStreamFormatDump(self.handle, PERCIPIO_STREAM_COLOR)
         if len(color_fmt_list) == 0:
