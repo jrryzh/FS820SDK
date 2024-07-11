@@ -85,6 +85,12 @@ class FS820SDKInterface:
         Returns:
             ErrorCode(int): 0-正常，其他-错误
         """
+        # 查看当前曝光时间
+        value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
+        print (f"exposure_time: {value}")
+        
+        # 设置曝光时间
+        TYSetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, 500)
         
         color_fmt_list = self.cl.DeviceStreamFormatDump(self.handle, PERCIPIO_STREAM_COLOR)
         if len(color_fmt_list) == 0:
