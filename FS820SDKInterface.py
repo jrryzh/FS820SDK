@@ -72,7 +72,7 @@ class FS820SDKInterface:
                                  depth_path: str, 
                                  gray_path: str, 
                                  lr_gray_path: str = None,
-                                 exposure_time: float =80.0, 
+                                 exposure_time: float =80, 
                                  isOpen: bool =True, 
                                  TargetLight: int =50):
         """
@@ -163,4 +163,4 @@ if __name__ == '__main__':
     interface = FS820SDKInterface()
     intrinsic = interface.get_camera_intrinsic()
     print(intrinsic)
-    interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.png", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=500.0, isOpen=True, TargetLight=50)
+    interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.png", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=500, isOpen=True, TargetLight=50)
