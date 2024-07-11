@@ -1,4 +1,24 @@
+import pcammls
+from pcammls import * 
+import cv2
+import numpy
+import sys
+import os
 
+class PythonPercipioDeviceEvent(pcammls.DeviceEvent):
+    Offline = False
+
+    def __init__(self):
+        pcammls.DeviceEvent.__init__(self)
+
+    def run(self, handle, eventID):
+        if eventID==TY_EVENT_DEVICE_OFFLINE:
+          print('=== Event Callback: Device Offline!')
+          self.Offline = True
+        return 0
+
+    def IsOffline(self):
+        return self.Offline
 
 class FS820SDKInterface:
     
@@ -28,7 +48,7 @@ class FS820SDKInterface:
             print('no device found')
             return
         
-        self.event = PythonPercipioDeviceself.event()
+        self.event = PythonPercipioDeviceEvent.event()
         self.cl.DeviceRegiststerCallBackEvent(self.event)
         
         # 将当前rgb和depth流打开
