@@ -90,7 +90,11 @@ class FS820SDKInterface:
         print (f"exposure_time: {value}")
         
         # 设置曝光时间
-        TYSetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, 500)
+        TYSetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, exposure_time)
+        
+        # 查看当前曝光时间
+        value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
+        print (f"exposure_time: {value}")
         
         color_fmt_list = self.cl.DeviceStreamFormatDump(self.handle, PERCIPIO_STREAM_COLOR)
         if len(color_fmt_list) == 0:
@@ -159,4 +163,4 @@ if __name__ == '__main__':
     interface = FS820SDKInterface()
     intrinsic = interface.get_camera_intrinsic()
     print(intrinsic)
-    interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.png", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=80.0, isOpen=True, TargetLight=50)
+    interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.png", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=500.0, isOpen=True, TargetLight=50)
