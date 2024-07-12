@@ -106,7 +106,7 @@ class FS820SDKInterface:
         
         # 设置曝光时间
         exposure_time = int(exposure_time)
-        if expos_time < EL.min or expos_time > EL.max:
+        if exposure_time < EL.min or exposure_time > EL.max:
             print('exposure_time out of range')
             return -1
         elif exposure_time != value:
