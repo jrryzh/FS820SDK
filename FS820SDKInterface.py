@@ -46,11 +46,6 @@ class FS820SDKInterface:
             return
 
         self.sn = self.dev_list[selected_idx].id
-
-        self.handle = self.cl.Open(self.sn)
-        if not self.cl.isValidHandle(self.handle):
-            print('no device found')
-            return
     
     def get_camera_intrinsic(self):
         """
@@ -87,6 +82,10 @@ class FS820SDKInterface:
         
         ###################### 初始化开始 ######################
         # 将当前rgb和depth流打开
+        self.handle = self.cl.Open(self.sn)
+        if not self.cl.isValidHandle(self.handle):
+            print('no device found')
+            return
         self.event = PythonPercipioDeviceEvent()
         self.cl.DeviceRegiststerCallBackEvent(self.event)
         self.cl.DeviceStreamEnable(self.handle, PERCIPIO_STREAM_COLOR | PERCIPIO_STREAM_DEPTH)
