@@ -183,6 +183,8 @@ class FS820SDKInterface:
         mat_depth_registration = img_registration_depth.as_nparray()
         max_z = 1300.0
         depth_exr = mat_depth_registration.astype(np.float32) / 65535.0 * max_z
+        print("depth_exr shape", depth_exr.shape)
+        import ipdb; ipdb.set_trace()
         save_array_to_exr(depth_path, depth_exr)
         
         # 保存rgb图
