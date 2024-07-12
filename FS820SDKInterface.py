@@ -93,6 +93,16 @@ class FS820SDKInterface:
         self.cl.DeviceRegiststerCallBackEvent(self.event)
         self.cl.DeviceStreamEnable(self.handle, PERCIPIO_STREAM_COLOR | PERCIPIO_STREAM_DEPTH)
         
+        # 设置自动曝光模式
+        if isOpen:
+            param = self.cl.DevParamFromBool(false); 
+            self.cl.DeviceSetParameter(self.handle, TY_COMPONENT_RGB_CAM, TY_BOOL_AUTO_EXPOSURE, param)
+        
+        # 验证曝光模式
+        status = self.cl.DeviceGetParameter(self.handle, TY_COMPONENT_RGB_CAM, TY_BOOL_AUTO_EXPOSURE)
+        m_status = status.toBool()
+        print(f"current exposure value {m_status}")
+        
         # 查看当前曝光时间
         value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
         print (f"Current exposure_time: {value}")
