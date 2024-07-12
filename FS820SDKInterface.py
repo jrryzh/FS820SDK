@@ -205,6 +205,7 @@ class FS820SDKInterface:
         # hdr by target lights
         depth_list = []
         for i, TargetLight in enumerate(TargetLights):
+            print(f"taking {i+1} picture with target light {TargetLight}...")
             tmp_lr_gray_path = '/home/yofo/fs820/testoutput/tmp/lr_gray_{}.png'.format(TargetLight)
             tmp_depth_path = '/home/yofo/fs820/testoutput/tmp/depth_{}.exr'.format(TargetLight)
             tmp_gray_path = '/home/yofo/fs820/testoutput/tmp/gray_{}.png'.format(TargetLight)
