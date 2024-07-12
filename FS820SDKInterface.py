@@ -113,10 +113,10 @@ class FS820SDKInterface:
         print (f" NEW exposure_time: {value}")
         
         # 设置激光强度
-        TYSetInt(handle, TY_COMPONENT_LASER, TY_INT_LASER_POWER, TargetLight)
+        TYSetInt(self.handle, TY_COMPONENT_LASER, TY_INT_LASER_POWER, TargetLight)
         
         # 查看当前激光强度
-        Value = TYGetInt(handle, TY_COMPONENT_LASER, TY_INT_LASER_POWER)
+        Value = TYGetInt(self.handle, TY_COMPONENT_LASER, TY_INT_LASER_POWER)
         print (f"Current Laser Power: {Value}")
         
         
