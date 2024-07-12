@@ -55,11 +55,14 @@ class FS820SDKInterface:
                 [0, fy, cy],
                 [0,  0,  1]]
         """
+        self.handle = self.cl.Open(self.sn)
         color_calib_data = self.cl.DeviceReadCalibData(self.handle, PERCIPIO_STREAM_COLOR)
         color_calib_width = color_calib_data.Width()
         color_calib_height = color_calib_data.Height()
         color_calib_intr = color_calib_data.Intrinsic() # CalibDataVector
         print("Camera instrinsic: \n{}".format(color_calib_intr))
+        self.cl.DeviceStreamOff(self.handle)    
+        self.cl.Close(self.handle)
         return color_calib_intr
     
     def get_image_gray_and_depth(self, 
