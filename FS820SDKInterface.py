@@ -177,12 +177,12 @@ class FS820SDKInterface:
         depth_img_path = depth_path.split('.')[0] + '.png'
         self.cl.DeviceStreamDepthRender(img_registration_depth, img_registration_render)
         mat_depth_render = img_registration_render.as_nparray()
-        cv2.imwrite(depth_path, mat_depth_render)
+        cv2.imwrite(depth_img_path, mat_depth_render)
         
         # 保存depth exr 后面使用
         mat_depth_registration = img_registration_depth.as_nparray()
         max_z = 1300.0
-        depth_exr = mat_depth_registration.astype(np.float32) / 65535 * max_z
+        depth_exr = mat_depth_registration.astype(np.float32) / 65535.0 * max_z
         save_array_to_exr(depth_path, depth_exr)
         
         # 保存rgb图
