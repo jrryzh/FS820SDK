@@ -171,40 +171,27 @@ class FS820SDKInterface:
                     img_color = frame
 
         # 将depth对齐到rgb
-        self.cl.DeviceStreamMapDepthImageToColorCoordinate(depth_calib.data(), img_depth.width, img_depth.height, scale_unit,  img_depth,  color_calib.data(), img_color.width, img_color.height, img_registration_depth)
+        self.cl.DeviceStreamMapDepthImageToColorCoordinate(depth_calib.data(), img_depth.width, img_depth.height, scale_unit,  img_depth,  color_calib.data(), img_color.width, img_color.height, img_registration_depth)    
         
         # 保存depth图
+        depth_img_path = depth_path.split('.')[0] + '.png'
         self.cl.DeviceStreamDepthRender(img_registration_depth, img_registration_render)
         mat_depth_render = img_registration_render.as_nparray()
-        mat_depth_registration = img_registration_depth.as_nparray()
-        # cv2.imshow('registration', mat_depth_render)
-        # DEBUG
-        print("mat_depth_render")
-        print(mat_depth_render.shape)
-        print(mat_depth_render.dtype)
-        print(mat_depth_render[0])
-        print("mat_depth_registration")
-        print(mat_depth_registration.shape)
-        print(mat_depth_registration.dtype)
-        print(mat_depth_registration[0])
-        
         cv2.imwrite(depth_path, mat_depth_render)
         
-        # 比较三个通道
-        channel_1_equal_channel_2 = np.array_equal(mat_depth_render[:, :, 0], mat_depth_render[:, :, 1])
-        channel_2_equal_channel_3 = np.array_equal(mat_depth_render[:, :, 1], mat_depth_render[:, :, 2])
-        all_channels_equal = channel_1_equal_channel_2 and channel_2_equal_channel_3
-
-        print(f"第一通道和第二通道相等: {channel_1_equal_channel_2}")
-        print(f"第二通道和第三通道相等: {channel_2_equal_channel_3}")
-        print(f"所有通道是否完全相等: {all_channels_equal}")
-
+        # 保存depth exr 后面使用
+        mat_depth_registration = img_registration_depth.as_nparray()
+        max_z = 1300.0
+        depth_exr = mat_depth_registration.astype(np.float32) / 65535 * max_z
+        save_array_to_exr(depth_path, depth_exr)
+        
         # 保存rgb图
         self.cl.DeviceStreamImageDecode(img_color, img_parsed_color)
         self.cl.DeviceStreamDoUndistortion(color_calib.data(), img_parsed_color, img_undistortion_color)
         mat_undistortion_color = img_undistortion_color.as_nparray()
-        # cv2.imshow('undistortion rgb', mat_undistortion_color)
         cv2.imwrite(gray_path, mat_undistortion_color)
+        
+        return 0
         
         
     def get_hdr_by_targetlights(self, depth_path, gray_path, TargetLights=[40, 50, 60]):
@@ -237,5 +224,5 @@ class FS820SDKInterface:
 if __name__ == '__main__':
     interface = FS820SDKInterface()
     intrinsic = interface.get_camera_intrinsic()
-    interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.png", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=80.0, isOpen=True, TargetLight=50)
-    
+    interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.exr", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=80.0, isOpen=True, TargetLight=50)
+    interface.get_hdr_by_targetlights(depth_path="/home/yofo/fs820/testoutput/depth_hdr.exr", gray_path="/home/yofo/fs820/testoutput/gray_hdr.png", TargetLights=[40, 50, 60])
