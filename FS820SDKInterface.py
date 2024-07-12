@@ -185,8 +185,8 @@ class FS820SDKInterface:
         cv2.imwrite(depth_path, mat_depth_render)
         
         # 比较三个通道
-        channel_1_equal_channel_2 = np.array_equal(array[:, :, 0], array[:, :, 1])
-        channel_2_equal_channel_3 = np.array_equal(array[:, :, 1], array[:, :, 2])
+        channel_1_equal_channel_2 = np.array_equal(mat_depth_render[:, :, 0], mat_depth_render[:, :, 1])
+        channel_2_equal_channel_3 = np.array_equal(mat_depth_render[:, :, 1], mat_depth_render[:, :, 2])
         all_channels_equal = channel_1_equal_channel_2 and channel_2_equal_channel_3
 
         print(f"第一通道和第二通道相等: {channel_1_equal_channel_2}")
