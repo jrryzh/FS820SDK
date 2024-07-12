@@ -4,6 +4,7 @@ import cv2
 import numpy
 import sys
 import os
+import numpy as np
 
 from camera_util import save_array_to_exr, read_exr_to_array
 
