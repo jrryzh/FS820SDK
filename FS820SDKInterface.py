@@ -179,12 +179,12 @@ class FS820SDKInterface:
         mat_depth_render = img_registration_render.as_nparray()
         cv2.imwrite(depth_img_path, mat_depth_render)
         
-        # # 保存depth exr 后面使用
-        # mat_depth_registration = img_registration_depth.as_nparray()
-        # max_z = 1300.0
-        # depth_exr = mat_depth_registration.astype(np.float32) / 65535.0 * max_z
-        # depth_exr = depth_exr.squeeze()
-        # save_array_to_exr(depth_path, depth_exr)
+        # 保存depth exr 后面使用
+        mat_depth_registration = img_registration_depth.as_nparray()
+        max_z = 1300.0
+        depth_exr = mat_depth_registration.astype(np.float32) / 65535.0 * max_z
+        depth_exr = depth_exr.squeeze()
+        save_array_to_exr(depth_path, depth_exr)
         
         # 保存rgb图
         self.cl.DeviceStreamImageDecode(img_color, img_parsed_color)
@@ -226,4 +226,4 @@ if __name__ == '__main__':
     interface = FS820SDKInterface()
     intrinsic = interface.get_camera_intrinsic()
     interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.exr", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=80.0, isOpen=True, TargetLight=50)
-    interface.get_hdr_by_targetlights(depth_path="/home/yofo/fs820/testoutput/depth_hdr.exr", gray_path="/home/yofo/fs820/testoutput/gray_hdr.png", TargetLights=[40, 50, 60])
+    # interface.get_hdr_by_targetlights(depth_path="/home/yofo/fs820/testoutput/depth_hdr.exr", gray_path="/home/yofo/fs820/testoutput/gray_hdr.png", TargetLights=[40, 50, 60])
