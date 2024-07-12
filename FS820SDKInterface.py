@@ -51,12 +51,6 @@ class FS820SDKInterface:
         if not self.cl.isValidHandle(self.handle):
             print('no device found')
             return
-        
-        self.event = PythonPercipioDeviceEvent()
-        self.cl.DeviceRegiststerCallBackEvent(self.event)
-        
-        # 将当前rgb和depth流打开
-        self.cl.DeviceStreamEnable(self.handle, PERCIPIO_STREAM_COLOR | PERCIPIO_STREAM_DEPTH)
     
     def get_camera_intrinsic(self):
         """
@@ -92,6 +86,10 @@ class FS820SDKInterface:
         """
         
         ###################### 初始化开始 ######################
+        # 将当前rgb和depth流打开
+        self.event = PythonPercipioDeviceEvent()
+        self.cl.DeviceRegiststerCallBackEvent(self.event)
+        self.cl.DeviceStreamEnable(self.handle, PERCIPIO_STREAM_COLOR | PERCIPIO_STREAM_DEPTH)
         
         # 查看当前曝光时间
         value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
@@ -192,6 +190,10 @@ class FS820SDKInterface:
         self.cl.DeviceStreamDoUndistortion(color_calib.data(), img_parsed_color, img_undistortion_color)
         mat_undistortion_color = img_undistortion_color.as_nparray()
         cv2.imwrite(gray_path, mat_undistortion_color)
+        
+        # 关闭流
+        cl.DeviceStreamOff(handle)    
+        cl.Close(handle)
         
         return 0
         
