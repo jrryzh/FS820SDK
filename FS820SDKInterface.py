@@ -192,8 +192,8 @@ class FS820SDKInterface:
         cv2.imwrite(gray_path, mat_undistortion_color)
         
         # 关闭流
-        self.cl.DeviceStreamOff(handle)    
-        self.cl.Close(handle)
+        self.cl.DeviceStreamOff(self.handle)    
+        self.cl.Close(self.handle)
         
         return 0
         
