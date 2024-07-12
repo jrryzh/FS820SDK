@@ -176,7 +176,7 @@ class FS820SDKInterface:
         # 保存depth图
         self.cl.DeviceStreamDepthRender(img_registration_depth, img_registration_render)
         mat_depth_render = img_registration_render.as_nparray()
-        mat_depth_registration = img_registration_depth.as_nparray
+        mat_depth_registration = img_registration_depth.as_nparray()
         # cv2.imshow('registration', mat_depth_render)
         # DEBUG
         print("mat_depth_render")
