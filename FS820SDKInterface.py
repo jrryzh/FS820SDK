@@ -182,6 +182,15 @@ class FS820SDKInterface:
         print(mat_depth_render.dtype)
         print(mat_depth_render[0])
         cv2.imwrite(depth_path, mat_depth_render)
+        
+        # 比较三个通道
+        channel_1_equal_channel_2 = np.array_equal(array[:, :, 0], array[:, :, 1])
+        channel_2_equal_channel_3 = np.array_equal(array[:, :, 1], array[:, :, 2])
+        all_channels_equal = channel_1_equal_channel_2 and channel_2_equal_channel_3
+
+        print(f"第一通道和第二通道相等: {channel_1_equal_channel_2}")
+        print(f"第二通道和第三通道相等: {channel_2_equal_channel_3}")
+        print(f"所有通道是否完全相等: {all_channels_equal}")
 
         # 保存rgb图
         self.cl.DeviceStreamImageDecode(img_color, img_parsed_color)
