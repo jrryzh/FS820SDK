@@ -109,7 +109,7 @@ class FS820SDKInterface:
         if expos_time < EL.min or expos_time > EL.max:
             print('exposure_time out of range')
             return -1
-        else if exposure_time != value:
+        elif exposure_time != value:
             print('set exposure_time')
             TYSetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME, exposure_time)
         
