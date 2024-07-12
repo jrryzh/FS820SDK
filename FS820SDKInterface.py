@@ -211,7 +211,6 @@ class FS820SDKInterface:
 
             self.get_image_gray_and_depth(tmp_depth_path, tmp_gray_path, lr_gray_path=tmp_lr_gray_path, exposure_time=80.0,
                                      isOpen=True, TargetLight=TargetLight)
-            time.sleep(10)
             depth_list.append(read_exr_to_array(tmp_depth_path))
 
         mask_list = [(c!=0).astype(int) for c in depth_list]
