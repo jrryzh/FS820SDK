@@ -5,6 +5,7 @@ import numpy
 import sys
 import os
 import numpy as np
+import time
 
 from camera_util import save_array_to_exr, read_exr_to_array
 
@@ -202,14 +203,15 @@ class FS820SDKInterface:
         # hdr by target lights
         depth_list = []
         for i, TargetLight in enumerate(TargetLights):
-            tmp_lr_gray_path = '/tmp/lr_gray_{}.png'.format(TargetLight)
-            tmp_depth_path = '/tmp/depth_{}.exr'.format(TargetLight)
-            tmp_gray_path = '/tmp/gray_{}.png'.format(TargetLight)
+            tmp_lr_gray_path = '/home/yofo/fs820/testoutput/tmp/lr_gray_{}.png'.format(TargetLight)
+            tmp_depth_path = '/home/yofo/fs820/testoutput/tmp/depth_{}.exr'.format(TargetLight)
+            tmp_gray_path = '/home/yofo/fs820/testoutput/tmp/gray_{}.png'.format(TargetLight)
             if i == len(TargetLights)-1:
                 tmp_gray_path = gray_path
 
             self.get_image_gray_and_depth(tmp_depth_path, tmp_gray_path, lr_gray_path=tmp_lr_gray_path, exposure_time=80.0,
                                      isOpen=True, TargetLight=TargetLight)
+            time.sleep(10)
             depth_list.append(read_exr_to_array(tmp_depth_path))
 
         mask_list = [(c!=0).astype(int) for c in depth_list]
