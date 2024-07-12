@@ -5,6 +5,8 @@ import numpy
 import sys
 import os
 
+from camera_util import save_array_to_exr, read_exr_to_array
+
 class PythonPercipioDeviceEvent(pcammls.DeviceEvent):
     Offline = False
 
@@ -66,6 +68,7 @@ class FS820SDKInterface:
         color_calib_width = color_calib_data.Width()
         color_calib_height = color_calib_data.Height()
         color_calib_intr = color_calib_data.Intrinsic() # CalibDataVector
+        print("Camera instrinsic: \n{}".format(color_calib_intr))
         return color_calib_intr
     
     def get_image_gray_and_depth(self, 
@@ -85,6 +88,9 @@ class FS820SDKInterface:
         Returns:
             ErrorCode(int): 0-正常，其他-错误
         """
+        
+        ###################### 初始化开始 ######################
+        
         # 查看当前曝光时间
         value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
         print (f"Current exposure_time: {value}")
@@ -106,6 +112,17 @@ class FS820SDKInterface:
         value = TYGetInt(self.handle, TY_COMPONENT_RGB_CAM, TY_INT_EXPOSURE_TIME) 
         print (f" NEW exposure_time: {value}")
         
+        # 设置激光强度
+        TYSetInt(handle, TY_COMPONENT_LASER, TY_INT_LASER_POWER, TargetLight)
+        
+        # 查看当前激光强度
+        Value = TYGetInt(handle, TY_COMPONENT_LASER, TY_INT_LASER_POWER)
+        print (f"Current Laser Power: {Value}")
+        
+        
+        ###################### 初始化结束 ######################
+        
+        # 初始化rgb流格式
         color_fmt_list = self.cl.DeviceStreamFormatDump(self.handle, PERCIPIO_STREAM_COLOR)
         if len(color_fmt_list) == 0:
             print ('device has no color stream.')
@@ -116,7 +133,8 @@ class FS820SDKInterface:
             fmt = color_fmt_list[idx]
             print ('\t{} -size[{}x{}]\t-\t desc:{}'.format(idx, self.cl.Width(fmt), self.cl.Height(fmt), fmt.getDesc()))
         self.cl.DeviceStreamFormatConfig(self.handle, PERCIPIO_STREAM_COLOR, color_fmt_list[0])
-
+        
+        # 初始化depth流格式
         depth_fmt_list = self.cl.DeviceStreamFormatDump(self.handle, PERCIPIO_STREAM_DEPTH)
         if len(depth_fmt_list) == 0:
             print ('device has no depth stream.')
@@ -128,9 +146,11 @@ class FS820SDKInterface:
             print ('\t{} -size[{}x{}]\t-\t desc:{}'.format(idx, self.cl.Width(fmt), self.cl.Height(fmt), fmt.getDesc()))
         self.cl.DeviceStreamFormatConfig(self.handle, PERCIPIO_STREAM_DEPTH, depth_fmt_list[0])
 
+        # 设置scale_unit
         scale_unit = self.cl.DeviceReadCalibDepthScaleUnit(self.handle)
         print ('depth image scale unit :{}'.format(scale_unit))
-
+        
+        # 打开rgb和depth流
         depth_calib = self.cl.DeviceReadCalibData(self.handle, PERCIPIO_STREAM_DEPTH)
         color_calib = self.cl.DeviceReadCalibData(self.handle, PERCIPIO_STREAM_COLOR)
 
@@ -149,14 +169,21 @@ class FS820SDKInterface:
                 if frame.streamID == PERCIPIO_STREAM_COLOR:
                     img_color = frame
 
-        
+        # 将depth对齐到rgb
         self.cl.DeviceStreamMapDepthImageToColorCoordinate(depth_calib.data(), img_depth.width, img_depth.height, scale_unit,  img_depth,  color_calib.data(), img_color.width, img_color.height, img_registration_depth)
         
+        # 保存depth图
         self.cl.DeviceStreamDepthRender(img_registration_depth, img_registration_render)
         mat_depth_render = img_registration_render.as_nparray()
         # cv2.imshow('registration', mat_depth_render)
+        # DEBUG
+        print("mat_depth_render")
+        print(mat_depth_render.shape)
+        print(mat_depth_render.dtype)
+        print(mat_depth_render[0])
         cv2.imwrite(depth_path, mat_depth_render)
 
+        # 保存rgb图
         self.cl.DeviceStreamImageDecode(img_color, img_parsed_color)
         self.cl.DeviceStreamDoUndistortion(color_calib.data(), img_parsed_color, img_undistortion_color)
         mat_undistortion_color = img_undistortion_color.as_nparray()
@@ -165,12 +192,34 @@ class FS820SDKInterface:
         
         
     def get_hdr_by_targetlights(self, depth_path, gray_path, TargetLights=[40, 50, 60]):
-                
-        pass
+        """
+        hdr by multiple target lights
+        """
+        # hdr by target lights
+        depth_list = []
+        for i, TargetLight in enumerate(TargetLights):
+            tmp_lr_gray_path = '/tmp/lr_gray_{}.png'.format(TargetLight)
+            tmp_depth_path = '/tmp/depth_{}.exr'.format(TargetLight)
+            tmp_gray_path = '/tmp/gray_{}.png'.format(TargetLight)
+            if i == len(TargetLights)-1:
+                tmp_gray_path = gray_path
+
+            self.get_image_gray_and_depth(tmp_depth_path, tmp_gray_path, lr_gray_path=tmp_lr_gray_path, exposure_time=80.0,
+                                     isOpen=True, TargetLight=TargetLight)
+            depth_list.append(read_exr_to_array(tmp_depth_path))
+
+        mask_list = [(c!=0).astype(int) for c in depth_list]
+        num_contributing_images = sum(mask_list)
+        sum_values = sum([c.astype(float) for c in depth_list])
+        print('sum_values')
+        print(sum_values.dtype)
+        average_image = np.divide(sum_values, num_contributing_images.astype(float), out=np.zeros_like(sum_values),
+                                  where=num_contributing_images != 0)
+        save_array_to_exr(depth_path, average_image.astype(np.uint16))
     
     
 if __name__ == '__main__':
     interface = FS820SDKInterface()
     intrinsic = interface.get_camera_intrinsic()
-    print(intrinsic)
     interface.get_image_gray_and_depth(depth_path="/home/yofo/fs820/testoutput/depth.png", gray_path="/home/yofo/fs820/testoutput/gray.png", lr_gray_path="/home/yofo/fs820/testoutput/lr_gray.png", exposure_time=80.0, isOpen=True, TargetLight=50)
+    
